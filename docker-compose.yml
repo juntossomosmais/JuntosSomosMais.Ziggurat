@@ -11,14 +11,12 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
-
   rabbit:
     image: "rabbitmq:3-management"
     hostname: "rabbit"
     ports:
       - "15672:15672"
       - "5672:5672"
-
   mongo:
     image: mongo:7
     ports:
@@ -31,7 +29,6 @@ services:
       retries: 10
     entrypoint:
       [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "myReplicaSet" ]
-
   mongoclustersetup:
     image: mongo:7
     depends_on:
@@ -43,22 +40,29 @@ services:
       - bash
       - -c
       - ./app/mongo-init-replica-set.sh
-    
-  tests:
-    working_dir: "/app"
-    image: "mcr.microsoft.com/dotnet/sdk:8.0"
-    command: "./scripts/start-tests.sh"
+  integration-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: [ "./scripts/start-tests.sh" ]
     volumes:
       - .:/app
     environment:
-        - ConnectionStrings__SqlServer=Server=sqlserver;Database=TestDb;User=sa;Password=Password1;TrustServerCertificate=True
-        - ConnectionStrings__MongoDb=mongodb://mongo:27017?directConnection=true
+      - ConnectionStrings__SqlServer=Server=sqlserver;Database=TestDb;User=sa;Password=Password1;TrustServerCertificate=True
+      - ConnectionStrings__MongoDb=mongodb://mongo:27017?directConnection=true
     depends_on:
       sqlserver:
         condition: service_healthy
       mongoclustersetup:
         condition: service_completed_successfully
 
-networks:
-  mongoCluster:
-    driver: bridge
+  lint-formatter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    # Uncomment the following line to run the checker
+    # command: [ "./scripts/start-check-formatting.sh" ]
+    # Uncomment the following line to run the formatter
+    command: [ "./scripts/start-formatter.sh" ]

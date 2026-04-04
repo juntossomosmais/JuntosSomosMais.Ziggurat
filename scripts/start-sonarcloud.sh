@@ -1,35 +1,35 @@
 #!/usr/bin/env bash
 
-# https://www.willianantunes.com/blog/2021/05/production-ready-shell-startup-scripts-the-set-builtin/
 set -eu -o pipefail
 
-if [ -z "$1" ]; then
-  echo "Please provide the sonar token 👀"
-  exit 0
-fi
-
-if [ -z "$2" ]; then
-  echo "Please provide the project version 👀"
-  exit 0
-fi
-
-echo "### Reading variables..."
-SONAR_TOKEN=$1
-PROJECT_VERSION=$2
+PROJECT_KEY="juntossomosmais_JuntosSomosMais.Ziggurat"
+ORGANIZATION="juntossomosmais"
+SONAR_SETTINGS_PATH="$(pwd)/sonar-project.xml"
 
 # You should start the scanner prior building your project and running your tests
-dotnet sonarscanner begin \
-    /k:"rafaelpadovezi_Ziggurat" \
-    /o:"rafaelpadovezi" \
-    /d:sonar.login="$SONAR_TOKEN" \
-    /v:"$PROJECT_VERSION" \
+if [ -n "${PR_SOURCE_BRANCH:-}" ]; then
+  dotnet sonarscanner begin \
+    /d:sonar.token="$SONAR_TOKEN" \
+    /k:"$PROJECT_KEY" \
+    /o:"$ORGANIZATION" \
+    /d:sonar.pullrequest.base="$PR_TARGET_BRANCH" \
+    /d:sonar.pullrequest.branch="$PR_SOURCE_BRANCH" \
+    /d:sonar.pullrequest.key="$GITHUB_PR_NUMBER" \
     /d:sonar.host.url="https://sonarcloud.io" \
-    /d:sonar.cs.opencover.reportsPaths="**/*/coverage.opencover.xml" \
-    /d:sonar.cs.vstest.reportsPaths="**/*/*.trx" \
-    /d:sonar.exclusions="samples/**/*.cs"
+    /s:"$SONAR_SETTINGS_PATH"
+else
+  dotnet sonarscanner begin \
+    /d:sonar.token="$SONAR_TOKEN" \
+    /v:"$PROJECT_VERSION" \
+    /k:"$PROJECT_KEY" \
+    /o:"$ORGANIZATION" \
+    /d:sonar.host.url="https://sonarcloud.io" \
+    /d:sonar.branch.name="$SOURCE_BRANCH_NAME" \
+    /s:"$SONAR_SETTINGS_PATH"
+fi
 
-dotnet build
+# Now we can run our tests as usual
 ./scripts/start-tests.sh
 
-# Now we can collect the results 👍
-dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+# Now we can collect the results
+dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"

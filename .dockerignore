@@ -1,0 +1,11 @@
+*
+!src
+!tests
+!samples
+**/bin
+**/obj
+!Ziggurat.sln
+!scripts/*.sh
+!scripts/*.csx
+!runsettings.xml
+!dotnet-tools.json
