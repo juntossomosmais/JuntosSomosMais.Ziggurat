@@ -1,8 +1,8 @@
-﻿using DotNetCore.CAP;
+using System.Threading.Tasks;
+using DotNetCore.CAP;
 using Microsoft.AspNetCore.Mvc;
 using Sample.Cap.SqlServer.Domain.Models;
 using Sample.Cap.SqlServer.Infrastructure;
-using System.Threading.Tasks;
 
 namespace Sample.Cap.SqlServer.Controllers;
 

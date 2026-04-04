@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Ziggurat.Internal;
 
 namespace Ziggurat.Idempotency;

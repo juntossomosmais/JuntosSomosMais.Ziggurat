@@ -1,4 +1,4 @@
-﻿using DotNetCore.CAP;
+using DotNetCore.CAP;
 using Ziggurat;
 
 namespace Sample.Cap.Mongo;

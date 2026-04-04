@@ -1,9 +1,9 @@
-using MongoDB.Bson;
-using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Xunit;
 using Ziggurat.MongoDB.Tests.Support;
 
@@ -25,7 +25,7 @@ public class MongoDbStorageTests : TestFixture
         var tracking = new TestMessage("1436814771495108608", "test.queue");
         using (var session = MongoClient.StartIdempotentTransaction(tracking))
         {
-            session.CommitTransaction();
+            session.CommitTransaction(TestContext.Current.CancellationToken);
         }
 
         Exception exception = null;
@@ -54,7 +54,7 @@ public class MongoDbStorageTests : TestFixture
         testCollection.InsertOne(new BsonDocument(new Dictionary<string, object>
         {
             ["_id"] = "1"
-        }));
+        }), cancellationToken: TestContext.Current.CancellationToken);
         Exception exception = null;
 
         // Act
@@ -63,7 +63,7 @@ public class MongoDbStorageTests : TestFixture
             testCollection.InsertOne(new BsonDocument(new Dictionary<string, object>
             {
                 ["_id"] = "1"
-            }));
+            }), cancellationToken: TestContext.Current.CancellationToken);
         }
         catch (Exception ex)
         {
@@ -87,7 +87,8 @@ public class MongoDbStorageTests : TestFixture
     {
         // Arrange
         var testMessage = new TestMessage("1436814771495108608", "test.queue");
-        using (var _ = MongoClient.StartIdempotentTransaction(testMessage)) { } // insert message
+        using (var _ = MongoClient.StartIdempotentTransaction(testMessage))
+        { } // insert message
 
         // Act
         var result = await _storage.HasProcessedAsync(new TestMessage(testMessage.MessageId, "other-queue"));
@@ -101,7 +102,8 @@ public class MongoDbStorageTests : TestFixture
     {
         // Arrange
         var testMessage = new TestMessage("1436814771495108608", "test.queue");
-        using (var _ = MongoClient.StartIdempotentTransaction(testMessage)) { } // insert message
+        using (var _ = MongoClient.StartIdempotentTransaction(testMessage))
+        { } // insert message
 
         // Act
         var result = await _storage.HasProcessedAsync(new TestMessage("other-id", testMessage.MessageGroup));
@@ -117,7 +119,7 @@ public class MongoDbStorageTests : TestFixture
         var testMessage = new TestMessage("1436814771495108608", "test.queue");
         using (var session = MongoClient.StartIdempotentTransaction(testMessage))
         {
-            await session.CommitTransactionAsync();
+            await session.CommitTransactionAsync(TestContext.Current.CancellationToken);
         } // insert message
 
         // Act
@@ -166,23 +168,23 @@ public class MongoDbStorageTests : TestFixture
 
         var messages = new List<MessageTracking>() { tracking1, tracking2, tracking3, tracking4, tracking5, tracking6 };
 
-        await testCollection.InsertManyAsync(messages);
+        await testCollection.InsertManyAsync(messages, cancellationToken: TestContext.Current.CancellationToken);
 
         await MarkDocumentAsOld(testCollection, "1436814771495108601_test.queue");
         await MarkDocumentAsOld(testCollection, "1436814771495108602_test.queue");
         await MarkDocumentAsOld(testCollection, "1436814771495108603_test.queue");
 
         // Act
-        var result = await _storage.DeleteMessagesHistoryOlderThanAsync(30, 1000, default);
+        var result = await _storage.DeleteMessagesHistoryOlderThanAsync(30, 1000, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(3, result);
-        var remainingMessages = await testCollection.Find(_ => true).ToListAsync();
+        var remainingMessages = await testCollection.Find(_ => true).ToListAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.Collection(remainingMessages,
             x => Assert.Equal("1436814771495108604_test.queue", x.Id),
             x => Assert.Equal("1436814771495108605_test.queue", x.Id),
             x => Assert.Equal("1436814771495108606_test.queue", x.Id));
-        await testCollection.DeleteManyAsync(_ => true);
+        await testCollection.DeleteManyAsync(_ => true, cancellationToken: TestContext.Current.CancellationToken);
     }
 
     private static async Task MarkDocumentAsOld(IMongoCollection<MessageTracking> testCollection, string id)
@@ -205,8 +207,8 @@ public class MongoDbStorageTests : TestFixture
         await _storage.InitializeAsync(CancellationToken.None);
 
         // Assert
-        var indexes = await testCollection.Indexes.ListAsync();
-        var indexNames = await indexes.ToListAsync();
+        var indexes = await testCollection.Indexes.ListAsync(TestContext.Current.CancellationToken);
+        var indexNames = await indexes.ToListAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.Contains(indexNames, x => x["name"].AsString == nameof(MessageTracking.DateTime));
     }
 }

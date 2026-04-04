@@ -1,4 +1,4 @@
-﻿namespace Ziggurat.SqlServer;
+namespace Ziggurat.SqlServer;
 
 public class MessageTracking
 {

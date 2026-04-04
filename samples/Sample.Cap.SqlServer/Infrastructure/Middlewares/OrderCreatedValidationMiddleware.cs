@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Sample.Cap.SqlServer.Dtos;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Sample.Cap.SqlServer.Dtos;
 using Ziggurat;
 
 namespace Sample.Cap.SqlServer.Infrastructure.Middlewares;

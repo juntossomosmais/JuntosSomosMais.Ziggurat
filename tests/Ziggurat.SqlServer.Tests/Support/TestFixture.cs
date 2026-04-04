@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Xunit;
 
 namespace Ziggurat.SqlServer.Tests.Support;
@@ -24,7 +24,8 @@ public class TestFixture : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (_isDisposed) return;
+        if (_isDisposed)
+            return;
 
         if (disposing)
         {

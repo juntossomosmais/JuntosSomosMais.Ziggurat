@@ -1,4 +1,4 @@
-﻿namespace Ziggurat.MongoDB;
+namespace Ziggurat.MongoDB;
 
 public class MessageTracking
 {

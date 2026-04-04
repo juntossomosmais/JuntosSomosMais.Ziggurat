@@ -1,4 +1,4 @@
-﻿using Ziggurat;
+using Ziggurat;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;

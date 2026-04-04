@@ -1,10 +1,10 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 using Ziggurat.Idempotency;
 
@@ -94,7 +94,7 @@ public class CleanerTests
         // Assert
         while (!cancellationTokenSource.IsCancellationRequested)
         {
-            await Task.Delay(100);
+            await Task.Delay(100, TestContext.Current.CancellationToken);
         }
         mockStorage.Verify();
         mockLogger.VerifyLog(x => x.LogInformation("Ziggurat cleaner background service is stopping."));

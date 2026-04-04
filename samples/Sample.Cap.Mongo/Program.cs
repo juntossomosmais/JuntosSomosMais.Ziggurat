@@ -1,7 +1,7 @@
+using System.Globalization;
 using DotNetCore.CAP;
 using MongoDB.Driver;
 using Sample.Cap.Mongo;
-using System.Globalization;
 using Ziggurat;
 using Ziggurat.CapAdapter;
 using Ziggurat.MongoDB;

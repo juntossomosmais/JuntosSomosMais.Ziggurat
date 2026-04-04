@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Ziggurat.SqlServer.Tests.Support;
 
@@ -100,7 +100,7 @@ public class EntityFrameworkStorageTests : TestFixture
         // Arrange
         var tracking = new MessageTracking("1436814771495108608", "test.queue");
         Context.Add(tracking);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
         Context.DetachAllEntities();
 
         // Act
@@ -116,7 +116,7 @@ public class EntityFrameworkStorageTests : TestFixture
         // Arrange
         var tracking = new MessageTracking("1436814771495108608", "test.queue");
         Context.Add(tracking);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
         Context.DetachAllEntities();
 
         // Act
@@ -132,7 +132,7 @@ public class EntityFrameworkStorageTests : TestFixture
         // Arrange
         var tracking = new MessageTracking("1436814771495108608", "test.queue");
         Context.Add(tracking);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
         Context.DetachAllEntities();
 
         // Act
@@ -185,18 +185,18 @@ public class EntityFrameworkStorageTests : TestFixture
         var tracking5 = new MessageTracking("1436814771495108605", "test.queue");
         var tracking6 = new MessageTracking("1436814771495108606", "test.queue");
         Context.AddRange(tracking1, tracking2, tracking3, tracking4, tracking5, tracking6);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // update timestamp of messages to be deleted
-        await Context.Database.ExecuteSqlInterpolatedAsync($"UPDATE MessageTracking SET DateTime = {DateTime.Now.AddDays(-60)} WHERE Id IN ('1436814771495108604','1436814771495108605','1436814771495108606')");
+        await Context.Database.ExecuteSqlInterpolatedAsync($"UPDATE MessageTracking SET DateTime = {DateTime.Now.AddDays(-60)} WHERE Id IN ('1436814771495108604','1436814771495108605','1436814771495108606')", cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _storage.DeleteMessagesHistoryOlderThanAsync(30, 100, default);
+        var result = await _storage.DeleteMessagesHistoryOlderThanAsync(30, 100, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(3, result);
         Assert.Equal(3, Context.Messages.Count());
-        var dbMessages = await Context.Messages.ToListAsync();
+        var dbMessages = await Context.Messages.ToListAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.Collection(dbMessages,
             x => Assert.Equal("1436814771495108601", x.Id),
             x => Assert.Equal("1436814771495108602", x.Id),
@@ -215,14 +215,13 @@ public class EntityFrameworkStorageTests : TestFixture
         var tracking5 = new MessageTracking("1436814771495108605", "test.queue");
         var tracking6 = new MessageTracking("1436814771495108606", "test.queue");
         Context.AddRange(tracking1, tracking2, tracking3, tracking4, tracking5, tracking6);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // update timestamp of messages to be deleted
-        await Context.Database.ExecuteSqlInterpolatedAsync(
-            $"UPDATE MessageTracking SET DateTime = {DateTime.Now.AddDays(-60)} WHERE Id IN ('1436814771495108601','1436814771495108602','1436814771495108603', '1436814771495108604','1436814771495108605','1436814771495108606')");
+        await Context.Database.ExecuteSqlInterpolatedAsync($"UPDATE MessageTracking SET DateTime = {DateTime.Now.AddDays(-60)} WHERE Id IN ('1436814771495108601','1436814771495108602','1436814771495108603', '1436814771495108604','1436814771495108605','1436814771495108606')", cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _storage.DeleteMessagesHistoryOlderThanAsync(30, 3, default);
+        var result = await _storage.DeleteMessagesHistoryOlderThanAsync(30, 3, TestContext.Current.CancellationToken);
 
         // Assert
         // Assert
@@ -243,11 +242,10 @@ public class EntityFrameworkStorageTests : TestFixture
         var tracking5 = new MessageTracking("1436814771495108605", "test.queue");
         var tracking6 = new MessageTracking("1436814771495108606", "test.queue");
         dbContext.AddRange(tracking1, tracking2, tracking3, tracking4, tracking5, tracking6);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // update timestamp of messages to be deleted
-        await dbContext.Database.ExecuteSqlInterpolatedAsync(
-            $"UPDATE MessageTracking SET DateTime = {DateTime.Now.AddDays(-60)} WHERE Id IN ('1436814771495108601','1436814771495108602','1436814771495108603', '1436814771495108604','1436814771495108605','1436814771495108606')");
+        await dbContext.Database.ExecuteSqlInterpolatedAsync($"UPDATE MessageTracking SET DateTime = {DateTime.Now.AddDays(-60)} WHERE Id IN ('1436814771495108601','1436814771495108602','1436814771495108603', '1436814771495108604','1436814771495108605','1436814771495108606')", cancellationToken: TestContext.Current.CancellationToken);
 
 
         // create two storages with different contexts to allow run async queries in parallel
@@ -265,6 +263,6 @@ public class EntityFrameworkStorageTests : TestFixture
 
         // Assert
         Assert.Equal(new[] { 3, 3 }, results);
-        Assert.Equal(0, await dbContext.Messages.AsNoTracking().CountAsync());
+        Assert.Equal(0, await dbContext.Messages.AsNoTracking().CountAsync(cancellationToken: TestContext.Current.CancellationToken));
     }
 }

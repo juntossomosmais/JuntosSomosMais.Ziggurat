@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Ziggurat.Idempotency;
 
@@ -48,9 +48,7 @@ public class EntityFrameworkStorage<TContext> : IStorage
 
     private static void CheckIfDbSetExists(TContext context)
     {
-        var metaData = context.Model.FindEntityType(typeof(MessageTracking));
-        if (metaData == null)
-            throw new InvalidOperationException(
+        var metaData = context.Model.FindEntityType(typeof(MessageTracking)) ?? throw new InvalidOperationException(
                 "Cannot create IdempotencyService because a DbSet for 'MessageTracking' is not included in the model for the context.");
     }
 

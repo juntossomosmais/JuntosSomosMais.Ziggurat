@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -131,10 +131,6 @@ internal sealed class Cleaner : BackgroundService
     private void CheckDependencies()
     {
         using var scope = _serviceProvider.CreateScope();
-        var service = scope.ServiceProvider.GetService<IStorage>();
-        if (service is null)
-        {
-            throw new InvalidOperationException("Cannot create Ziggurat cleaner background service because IStorage is not registered.");
-        }
+        var service = scope.ServiceProvider.GetService<IStorage>() ?? throw new InvalidOperationException("Cannot create Ziggurat cleaner background service because IStorage is not registered.");
     }
 }

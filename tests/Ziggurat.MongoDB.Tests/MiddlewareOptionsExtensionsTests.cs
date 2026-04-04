@@ -1,5 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Ziggurat.Idempotency;
 using Ziggurat.MongoDB.Tests.Support;

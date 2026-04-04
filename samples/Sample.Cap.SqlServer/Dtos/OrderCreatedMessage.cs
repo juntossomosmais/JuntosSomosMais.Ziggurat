@@ -1,4 +1,4 @@
-﻿using Ziggurat;
+using Ziggurat;
 
 namespace Sample.Cap.SqlServer.Dtos;
 

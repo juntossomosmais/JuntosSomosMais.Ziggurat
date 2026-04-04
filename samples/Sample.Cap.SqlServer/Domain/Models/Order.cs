@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Sample.Cap.SqlServer.Domain.Models;
 

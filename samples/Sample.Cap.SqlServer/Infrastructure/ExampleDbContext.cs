@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Sample.Cap.SqlServer.Domain.Models;
 using Ziggurat.SqlServer;
 

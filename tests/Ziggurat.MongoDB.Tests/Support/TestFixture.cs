@@ -1,5 +1,5 @@
-﻿using MongoDB.Driver;
 using System;
+using MongoDB.Driver;
 using Xunit;
 
 namespace Ziggurat.MongoDB.Tests.Support;

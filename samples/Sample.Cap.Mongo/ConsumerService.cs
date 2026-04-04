@@ -1,4 +1,4 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
 using Ziggurat;
 using Ziggurat.MongoDB;
 

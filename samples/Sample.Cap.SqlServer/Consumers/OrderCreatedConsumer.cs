@@ -1,6 +1,6 @@
-﻿using DotNetCore.CAP;
-using Sample.Cap.SqlServer.Dtos;
 using System.Threading.Tasks;
+using DotNetCore.CAP;
+using Sample.Cap.SqlServer.Dtos;
 using Ziggurat;
 
 namespace Sample.Cap.SqlServer.Consumers;

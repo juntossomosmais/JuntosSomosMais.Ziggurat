@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +11,6 @@ using Sample.Cap.SqlServer.Domain.Services;
 using Sample.Cap.SqlServer.Dtos;
 using Sample.Cap.SqlServer.Infrastructure;
 using Sample.Cap.SqlServer.Infrastructure.Middlewares;
-using System;
 using Ziggurat;
 using Ziggurat.CapAdapter;
 using Ziggurat.Logging;
@@ -67,7 +67,8 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
     {
-        if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+        if (env.IsDevelopment())
+            app.UseDeveloperExceptionPage();
 
         app.UseRouting();
 

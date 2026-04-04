@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Sample.Cap.SqlServer.Dtos;
 using Sample.Cap.SqlServer.Infrastructure;
-using System.Threading.Tasks;
 using Ziggurat;
 
 namespace Sample.Cap.SqlServer.Domain.Services;
