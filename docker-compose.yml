@@ -55,7 +55,6 @@ services:
         condition: service_healthy
       mongoclustersetup:
         condition: service_completed_successfully
-
   lint-formatter:
     build:
       context: .
@@ -63,6 +62,6 @@ services:
     volumes:
       - .:/app
     # Uncomment the following line to run the checker
-    # command: [ "./scripts/start-check-formatting.sh" ]
+    command: [ "./scripts/start-check-formatting.sh" ]
     # Uncomment the following line to run the formatter
-    command: [ "./scripts/start-formatter.sh" ]
+#    command: [ "./scripts/start-formatter.sh" ]

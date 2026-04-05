@@ -1,10 +1,10 @@
 using System.Globalization;
 using DotNetCore.CAP;
+using JuntosSomosMais.Ziggurat;
+using JuntosSomosMais.Ziggurat.CapAdapter;
+using JuntosSomosMais.Ziggurat.MongoDB;
 using MongoDB.Driver;
 using Sample.Cap.Mongo;
-using Ziggurat;
-using Ziggurat.CapAdapter;
-using Ziggurat.MongoDB;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
+using JuntosSomosMais.Ziggurat;
 using Microsoft.Extensions.Logging;
 using Sample.Cap.SqlServer.Dtos;
-using Ziggurat;
 
 namespace Sample.Cap.SqlServer.Infrastructure.Middlewares;
 

@@ -1,6 +1,6 @@
+using JuntosSomosMais.Ziggurat.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Sample.Cap.SqlServer.Domain.Models;
-using Ziggurat.SqlServer;
 
 namespace Sample.Cap.SqlServer.Infrastructure;
 

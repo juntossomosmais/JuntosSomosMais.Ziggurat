@@ -1,4 +1,8 @@
 using System;
+using JuntosSomosMais.Ziggurat;
+using JuntosSomosMais.Ziggurat.CapAdapter;
+using JuntosSomosMais.Ziggurat.Logging;
+using JuntosSomosMais.Ziggurat.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -11,10 +15,6 @@ using Sample.Cap.SqlServer.Domain.Services;
 using Sample.Cap.SqlServer.Dtos;
 using Sample.Cap.SqlServer.Infrastructure;
 using Sample.Cap.SqlServer.Infrastructure.Middlewares;
-using Ziggurat;
-using Ziggurat.CapAdapter;
-using Ziggurat.Logging;
-using Ziggurat.SqlServer;
 
 namespace Sample.Cap.SqlServer;
 

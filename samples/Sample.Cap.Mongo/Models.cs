@@ -1,4 +1,4 @@
-using Ziggurat;
+using JuntosSomosMais.Ziggurat;
 
 namespace Sample.Cap.Mongo;
 

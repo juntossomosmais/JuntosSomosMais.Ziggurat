@@ -14,8 +14,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Ziggurat.CapAdapter\Ziggurat.CapAdapter.csproj" />
-      <ProjectReference Include="..\..\src\Ziggurat.MongoDB\Ziggurat.MongoDB.csproj" />
+      <ProjectReference Include="..\..\src\JuntosSomosMais.Ziggurat.CapAdapter\JuntosSomosMais.Ziggurat.CapAdapter.csproj" />
+      <ProjectReference Include="..\..\src\JuntosSomosMais.Ziggurat.MongoDB\JuntosSomosMais.Ziggurat.MongoDB.csproj" />
     </ItemGroup>
 
 </Project>

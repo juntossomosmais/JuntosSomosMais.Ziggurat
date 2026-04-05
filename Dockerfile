@@ -12,13 +12,13 @@ WORKDIR /app
 COPY *.sln ./
 COPY src/Directory.Build.props src/Directory.Packages.props src/
 COPY tests/Directory.Build.props tests/Directory.Packages.props tests/
-COPY src/Ziggurat/*.csproj src/Ziggurat/
-COPY src/Ziggurat.CapAdapter/*.csproj src/Ziggurat.CapAdapter/
-COPY src/Ziggurat.MongoDB/*.csproj src/Ziggurat.MongoDB/
-COPY src/Ziggurat.SqlServer/*.csproj src/Ziggurat.SqlServer/
-COPY tests/Ziggurat.Tests/*.csproj tests/Ziggurat.Tests/
-COPY tests/Ziggurat.MongoDB.Tests/*.csproj tests/Ziggurat.MongoDB.Tests/
-COPY tests/Ziggurat.SqlServer.Tests/*.csproj tests/Ziggurat.SqlServer.Tests/
+COPY src/JuntosSomosMais.Ziggurat/*.csproj src/JuntosSomosMais.Ziggurat/
+COPY src/JuntosSomosMais.Ziggurat.CapAdapter/*.csproj src/JuntosSomosMais.Ziggurat.CapAdapter/
+COPY src/JuntosSomosMais.Ziggurat.MongoDB/*.csproj src/JuntosSomosMais.Ziggurat.MongoDB/
+COPY src/JuntosSomosMais.Ziggurat.SqlServer/*.csproj src/JuntosSomosMais.Ziggurat.SqlServer/
+COPY tests/JuntosSomosMais.Ziggurat.Tests/*.csproj tests/JuntosSomosMais.Ziggurat.Tests/
+COPY tests/JuntosSomosMais.Ziggurat.MongoDB.Tests/*.csproj tests/JuntosSomosMais.Ziggurat.MongoDB.Tests/
+COPY tests/JuntosSomosMais.Ziggurat.SqlServer.Tests/*.csproj tests/JuntosSomosMais.Ziggurat.SqlServer.Tests/
 COPY samples/Sample.Cap.SqlServer/*.csproj samples/Sample.Cap.SqlServer/
 COPY samples/Sample.Cap.Mongo/*.csproj samples/Sample.Cap.Mongo/
 RUN dotnet restore

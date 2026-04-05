@@ -28,12 +28,12 @@ Ziggurat has support to:
 
 ## Install
 
-|                     |                                                                                                              |
-|---------------------|--------------------------------------------------------------------------------------------------------------|
-| Ziggurat            | [![Nuget](https://img.shields.io/nuget/v/Ziggurat)](https://www.nuget.org/packages/Ziggurat)                 |
-| Ziggurat.CapAdapter | [![Nuget](https://img.shields.io/nuget/v/Ziggurat.CapAdapter)](https://www.nuget.org/packages/Ziggurat.CapAdapter) |
-| Ziggurat.SqlServer  | [![Nuget](https://img.shields.io/nuget/v/Ziggurat.SqlServer)](https://www.nuget.org/packages/Ziggurat.SqlServer) |
-| Ziggurat.MongoDB    | [![Nuget](https://img.shields.io/nuget/v/Ziggurat.MongoDB)](https://www.nuget.org/packages/Ziggurat.MongoDB) |
+|                                        |                                                                                                              |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| JuntosSomosMais.Ziggurat              | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat)                 |
+| JuntosSomosMais.Ziggurat.CapAdapter   | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.CapAdapter)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.CapAdapter) |
+| JuntosSomosMais.Ziggurat.SqlServer    | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.SqlServer)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.SqlServer) |
+| JuntosSomosMais.Ziggurat.MongoDB      | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.MongoDB)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.MongoDB) |
 
 ## Usage
 
@@ -71,7 +71,7 @@ public class MyMessageConsumerService : IConsumerService<MyMessage>
 } 
 ```
 
-Ziggurat.SqlServer ensures that the processed messages are tracked by the EF Core `DbContext`. Calling `SaveChangesAsync` will save the changes made to the business objects and the processed message to the DB.
+JuntosSomosMais.Ziggurat.SqlServer ensures that the processed messages are tracked by the EF Core `DbContext`. Calling `SaveChangesAsync` will save the changes made to the business objects and the processed message to the DB.
 
 The message type must implements the interface `IMessage`.
 
@@ -197,6 +197,5 @@ services.AddZigguratCleaner(options => {
 ## Run tests
 
 ```shell
-docker compose up -d mongoclustersetup sqlserver
-dotnet test
+docker compose run --rm --remove-orphans integration-tests
 ```

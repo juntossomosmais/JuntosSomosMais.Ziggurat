@@ -1,6 +1,6 @@
+using JuntosSomosMais.Ziggurat;
+using JuntosSomosMais.Ziggurat.MongoDB;
 using MongoDB.Driver;
-using Ziggurat;
-using Ziggurat.MongoDB;
 
 namespace Sample.Cap.Mongo;
 

@@ -15,8 +15,8 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Ziggurat.CapAdapter\Ziggurat.CapAdapter.csproj" />
-      <ProjectReference Include="..\..\src\Ziggurat.SqlServer\Ziggurat.SqlServer.csproj" />
+      <ProjectReference Include="..\..\src\JuntosSomosMais.Ziggurat.CapAdapter\JuntosSomosMais.Ziggurat.CapAdapter.csproj" />
+      <ProjectReference Include="..\..\src\JuntosSomosMais.Ziggurat.SqlServer\JuntosSomosMais.Ziggurat.SqlServer.csproj" />
     </ItemGroup>
 
 </Project>

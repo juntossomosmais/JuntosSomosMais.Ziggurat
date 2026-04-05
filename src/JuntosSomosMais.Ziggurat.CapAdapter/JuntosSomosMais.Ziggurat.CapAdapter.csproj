@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="DotNetCore.CAP" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\JuntosSomosMais.Ziggurat\JuntosSomosMais.Ziggurat.csproj" />
+	</ItemGroup>
+
+</Project>

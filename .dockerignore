@@ -4,7 +4,7 @@
 !samples
 **/bin
 **/obj
-!Ziggurat.sln
+!JuntosSomosMais.Ziggurat.sln
 !scripts/*.sh
 !scripts/*.csx
 !runsettings.xml

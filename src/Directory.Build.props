@@ -10,7 +10,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>A .NET library to create message consumers.</Description>
-        <RepositoryUrl>https://github.com/rafaelpadovezi/Ziggurat</RepositoryUrl>
+        <RepositoryUrl>https://github.com/juntossomosmais/JuntosSomosMais.Ziggurat</RepositoryUrl>
         <PackageIcon>icon.png</PackageIcon>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
