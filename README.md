@@ -1,7 +1,7 @@
 # ![Ziggurat icon](./docs/icon.png) Ziggurat
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=rafaelpadovezi_Ziggurat&metric=alert_status)](https://sonarcloud.io/dashboard?id=rafaelpadovezi_Ziggurat)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=rafaelpadovezi_Ziggurat&metric=coverage)](https://sonarcloud.io/dashboard?id=rafaelpadovezi_Ziggurat)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=juntossomosmais_JuntosSomosMais.Ziggurat&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=juntossomosmais_JuntosSomosMais.Ziggurat)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=juntossomosmais_JuntosSomosMais.Ziggurat&metric=coverage)](https://sonarcloud.io/summary/new_code?id=juntossomosmais_JuntosSomosMais.Ziggurat)
 
 A .NET library to create message consumers.
 
