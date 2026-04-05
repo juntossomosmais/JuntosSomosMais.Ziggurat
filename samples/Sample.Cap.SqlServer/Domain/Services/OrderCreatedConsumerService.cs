@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using JuntosSomosMais.Ziggurat;
 using Microsoft.Extensions.Logging;
@@ -19,10 +20,10 @@ public class OrderCreatedConsumerService : IConsumerService<OrderCreatedMessage>
         _logger = logger;
     }
 
-    public async Task ProcessMessageAsync(OrderCreatedMessage message)
+    public async Task ProcessMessageAsync(OrderCreatedMessage message, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Got {message}", message);
         // Do something
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

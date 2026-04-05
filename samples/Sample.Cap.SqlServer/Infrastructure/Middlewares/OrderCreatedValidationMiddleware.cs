@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using JuntosSomosMais.Ziggurat;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ public class OrderCreatedValidationMiddleware : IConsumerMiddleware<OrderCreated
         _logger = logger;
     }
 
-    public Task OnExecutingAsync(OrderCreatedMessage message, ConsumerServiceDelegate<OrderCreatedMessage> next)
+    public Task OnExecutingAsync(OrderCreatedMessage message, ConsumerServiceDelegate<OrderCreatedMessage> next, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(message.Number))
         {
@@ -22,6 +23,6 @@ public class OrderCreatedValidationMiddleware : IConsumerMiddleware<OrderCreated
             return Task.CompletedTask;
         }
 
-        return next(message);
+        return next(message, cancellationToken);
     }
 }

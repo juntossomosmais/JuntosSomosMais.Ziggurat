@@ -3,7 +3,7 @@ using Xunit;
 
 namespace JuntosSomosMais.Ziggurat.SqlServer.Tests.Support;
 
-[Collection("TextFixture Collection")]
+[Collection("TestFixture Collection")]
 public class TestFixture : IDisposable
 {
     private bool _isDisposed;

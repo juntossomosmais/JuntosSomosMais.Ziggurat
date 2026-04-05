@@ -8,6 +8,7 @@ using Xunit;
 
 namespace JuntosSomosMais.Ziggurat.SqlServer.Tests;
 
+[Collection("TestFixture Collection")]
 public class EntityFrameworkStorageTests : TestFixture
 {
     private readonly EntityFrameworkStorage<TestDbContext> _storage;
@@ -104,7 +105,7 @@ public class EntityFrameworkStorageTests : TestFixture
         Context.DetachAllEntities();
 
         // Act
-        var result = await _storage.HasProcessedAsync(new TestMessage(tracking.Id, tracking.Type));
+        var result = await _storage.HasProcessedAsync(new TestMessage(tracking.Id, tracking.Type), TestContext.Current.CancellationToken);
 
         // Arrange
         Assert.True(result);
@@ -120,7 +121,7 @@ public class EntityFrameworkStorageTests : TestFixture
         Context.DetachAllEntities();
 
         // Act
-        var result = await _storage.HasProcessedAsync(new TestMessage(tracking.Id, "other-queue"));
+        var result = await _storage.HasProcessedAsync(new TestMessage(tracking.Id, "other-queue"), TestContext.Current.CancellationToken);
 
         // Arrange
         Assert.False(result);
@@ -136,7 +137,7 @@ public class EntityFrameworkStorageTests : TestFixture
         Context.DetachAllEntities();
 
         // Act
-        var result = await _storage.HasProcessedAsync(new TestMessage("new-message-id", tracking.Type));
+        var result = await _storage.HasProcessedAsync(new TestMessage("new-message-id", tracking.Type), TestContext.Current.CancellationToken);
 
         // Arrange
         Assert.False(result);
@@ -146,7 +147,7 @@ public class EntityFrameworkStorageTests : TestFixture
     public async Task HasProcessedAsync_MessageIsNew_ShouldTrackMessage()
     {
         // Arrange & Act
-        var result = await _storage.HasProcessedAsync(new TestMessage("1436814771495108608", "test.queue"));
+        var result = await _storage.HasProcessedAsync(new TestMessage("1436814771495108608", "test.queue"), TestContext.Current.CancellationToken);
 
         // Arrange
         Assert.False(result);

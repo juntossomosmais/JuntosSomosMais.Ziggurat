@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using JuntosSomosMais.Ziggurat.Logging;
 using Microsoft.Extensions.Logging;
@@ -27,9 +28,9 @@ public class LoggingMiddlewareTests
             MessageId = "message1"
         };
         var mockDelegate = new Mock<ConsumerServiceDelegate<TestMessage>>();
-        mockDelegate.Setup(d => d(testMessage)).Returns(Task.CompletedTask);
+        mockDelegate.Setup(d => d(testMessage, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
-        await _middleware.OnExecutingAsync(testMessage, mockDelegate.Object);
+        await _middleware.OnExecutingAsync(testMessage, mockDelegate.Object, CancellationToken.None);
 
         _mockLogger.VerifyLog(
             x => x.LogInformation("Executed group1:message1 in * ms."), Times.Once);
@@ -44,12 +45,31 @@ public class LoggingMiddlewareTests
             MessageId = "message1"
         };
         var mockDelegate = new Mock<ConsumerServiceDelegate<TestMessage>>();
-        mockDelegate.Setup(d => d(testMessage)).ThrowsAsync(new Exception());
+        mockDelegate.Setup(d => d(testMessage, It.IsAny<CancellationToken>())).ThrowsAsync(new Exception());
 
-        await Assert.ThrowsAsync<Exception>(() => _middleware.OnExecutingAsync(testMessage, mockDelegate.Object));
+        await Assert.ThrowsAsync<Exception>(() => _middleware.OnExecutingAsync(testMessage, mockDelegate.Object, CancellationToken.None));
 
         _mockLogger.VerifyLog(
             x => x.LogError("Executed group1:message1 with error in * ms."), Times.Once);
+    }
+
+    [Fact]
+    public async Task OnExecutingAsync_CancelledToken_ThrowsOperationCancelledException()
+    {
+        // Arrange
+        var testMessage = new TestMessage
+        {
+            MessageGroup = "group1",
+            MessageId = "message1"
+        };
+        var mockDelegate = new Mock<ConsumerServiceDelegate<TestMessage>>();
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => _middleware.OnExecutingAsync(testMessage, mockDelegate.Object, cts.Token));
+        mockDelegate.Verify(d => d(It.IsAny<TestMessage>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }
 

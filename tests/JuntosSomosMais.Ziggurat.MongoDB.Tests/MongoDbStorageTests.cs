@@ -9,6 +9,7 @@ using Xunit;
 
 namespace JuntosSomosMais.Ziggurat.MongoDB.Tests;
 
+[Collection("TestFixture Collection")]
 public class MongoDbStorageTests : TestFixture
 {
     private readonly MongoDbStorage _storage;
@@ -50,10 +51,11 @@ public class MongoDbStorageTests : TestFixture
     public void IsMessageExistsError_TryDuplicateKeyOtherEntity_ReturnFalse()
     {
         // Arrange
+        var uniqueId = Guid.NewGuid().ToString();
         var testCollection = MongoDatabase.GetCollection<BsonDocument>("test");
         testCollection.InsertOne(new BsonDocument(new Dictionary<string, object>
         {
-            ["_id"] = "1"
+            ["_id"] = uniqueId
         }), cancellationToken: TestContext.Current.CancellationToken);
         Exception exception = null;
 
@@ -62,7 +64,7 @@ public class MongoDbStorageTests : TestFixture
         {
             testCollection.InsertOne(new BsonDocument(new Dictionary<string, object>
             {
-                ["_id"] = "1"
+                ["_id"] = uniqueId
             }), cancellationToken: TestContext.Current.CancellationToken);
         }
         catch (Exception ex)
@@ -91,7 +93,7 @@ public class MongoDbStorageTests : TestFixture
         { } // insert message
 
         // Act
-        var result = await _storage.HasProcessedAsync(new TestMessage(testMessage.MessageId, "other-queue"));
+        var result = await _storage.HasProcessedAsync(new TestMessage(testMessage.MessageId, "other-queue"), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.False(result);
@@ -106,7 +108,7 @@ public class MongoDbStorageTests : TestFixture
         { } // insert message
 
         // Act
-        var result = await _storage.HasProcessedAsync(new TestMessage("other-id", testMessage.MessageGroup));
+        var result = await _storage.HasProcessedAsync(new TestMessage("other-id", testMessage.MessageGroup), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.False(result);
@@ -123,7 +125,7 @@ public class MongoDbStorageTests : TestFixture
         } // insert message
 
         // Act
-        var result = await _storage.HasProcessedAsync(new TestMessage(testMessage.MessageId, testMessage.MessageGroup));
+        var result = await _storage.HasProcessedAsync(new TestMessage(testMessage.MessageId, testMessage.MessageGroup), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(result);
@@ -149,7 +151,7 @@ public class MongoDbStorageTests : TestFixture
         }
 
         // Assert
-        var result = await _storage.HasProcessedAsync(new TestMessage(testMessage.MessageId, testMessage.MessageGroup));
+        var result = await _storage.HasProcessedAsync(new TestMessage(testMessage.MessageId, testMessage.MessageGroup), TestContext.Current.CancellationToken);
         Assert.False(result);
     }
 

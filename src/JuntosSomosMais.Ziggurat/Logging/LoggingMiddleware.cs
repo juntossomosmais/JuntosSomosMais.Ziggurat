@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 
 namespace JuntosSomosMais.Ziggurat.Logging;
@@ -13,13 +14,15 @@ public class LoggingMiddleware<TMessage> : IConsumerMiddleware<TMessage>
         _logger = logger;
     }
 
-    public async Task OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next)
+    public async Task OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var stopWatch = new Stopwatch();
         stopWatch.Start();
         try
         {
-            await next(message);
+            await next(message, cancellationToken);
             stopWatch.Stop();
             _logger.LogInformation("Executed {MessageGroup}:{MessageId} in {Elapsed:000} ms.",
                 message.MessageGroup,

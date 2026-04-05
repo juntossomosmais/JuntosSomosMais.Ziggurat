@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,23 +19,23 @@ internal class PipelineHandler<TMessage> : IConsumerService<TMessage>
         _service = service;
     }
 
-    public async Task ProcessMessageAsync(TMessage message)
+    public async Task ProcessMessageAsync(TMessage message, CancellationToken cancellationToken = default)
     {
         var middlewares = _serviceProvider.GetServices<IConsumerMiddleware<TMessage>>();
 
         var stack = new Stack<ConsumerServiceDelegate<TMessage>>();
-        stack.Push(consumerMessage => _service.ProcessMessageAsync(consumerMessage));
+        stack.Push((consumerMessage, ct) => _service.ProcessMessageAsync(consumerMessage, ct));
         foreach (var middleware in middlewares.Reverse())
-            stack.Push(consumerMessage => middleware.OnExecutingAsync(consumerMessage, stack.Pop()));
+            stack.Push((consumerMessage, ct) => middleware.OnExecutingAsync(consumerMessage, stack.Pop(), ct));
 
-        await stack.Pop()(message);
+        await stack.Pop()(message, cancellationToken);
     }
 }
 
-public delegate Task ConsumerServiceDelegate<in TMessage>(TMessage message)
+public delegate Task ConsumerServiceDelegate<in TMessage>(TMessage message, CancellationToken cancellationToken)
     where TMessage : IMessage;
 
 public interface IConsumerMiddleware<TMessage> where TMessage : IMessage
 {
-    public Task OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next);
+    public Task OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next, CancellationToken cancellationToken);
 }

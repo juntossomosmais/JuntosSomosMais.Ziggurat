@@ -26,12 +26,12 @@ public class MongoDbStorage : IStorage
                mongoWriteException.Message.Contains(ZigguratMongoDbOptions.ProcessedCollection);
     }
 
-    public async Task<bool> HasProcessedAsync(IMessage message)
+    public async Task<bool> HasProcessedAsync(IMessage message, CancellationToken cancellationToken = default)
     {
         var builder = Builders<MessageTracking>.Filter;
         var filter = builder.Eq(x => x.Id, MessageTracking.CreateId(message.MessageId, message.MessageGroup));
 
-        return await _collection.CountDocumentsAsync(filter) > 0;
+        return await _collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken) > 0;
     }
 
     public async Task<int> DeleteMessagesHistoryOlderThanAsync(int days, int batchSize, CancellationToken cancellationToken)

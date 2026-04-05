@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using JuntosSomosMais.Ziggurat.Idempotency;
 using Microsoft.Extensions.Logging;
@@ -19,14 +20,14 @@ public class IdempotentServiceTests
         var message = new TestMessage("message1", "group1");
 
         mockStorage
-            .Setup(x => x.HasProcessedAsync(message))
+            .Setup(x => x.HasProcessedAsync(message, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         // Act
-        await service.OnExecutingAsync(message, testMessage => mockService.Object.ProcessMessageAsync(testMessage));
+        await service.OnExecutingAsync(message, (testMessage, ct) => mockService.Object.ProcessMessageAsync(testMessage, ct), CancellationToken.None);
 
         // Assert
-        mockService.Verify(x => x.ProcessMessageAsync(message), Times.Once);
+        mockService.Verify(x => x.ProcessMessageAsync(message, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -40,14 +41,14 @@ public class IdempotentServiceTests
         var message = new TestMessage("message1", "group1");
 
         mockStorage
-            .Setup(x => x.HasProcessedAsync(message))
+            .Setup(x => x.HasProcessedAsync(message, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         // Act
-        await service.OnExecutingAsync(message, testMessage => mockService.Object.ProcessMessageAsync(testMessage));
+        await service.OnExecutingAsync(message, (testMessage, ct) => mockService.Object.ProcessMessageAsync(testMessage, ct), CancellationToken.None);
 
         // Assert
-        mockService.Verify(x => x.ProcessMessageAsync(message), Times.Never);
+        mockService.Verify(x => x.ProcessMessageAsync(message, It.IsAny<CancellationToken>()), Times.Never);
         mockLogger.VerifyLog(logger =>
             logger.LogInformation("Message was processed already. Ignoring message1:group1."));
     }
@@ -63,17 +64,17 @@ public class IdempotentServiceTests
         var message = new TestMessage("message1", "group1");
 
         mockStorage
-            .Setup(x => x.HasProcessedAsync(message))
+            .Setup(x => x.HasProcessedAsync(message, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
         mockStorage
             .Setup(x => x.IsMessageExistsError(It.IsAny<InvalidOperationException>()))
             .Returns(true);
         mockService
-            .Setup(x => x.ProcessMessageAsync(message))
+            .Setup(x => x.ProcessMessageAsync(message, It.IsAny<CancellationToken>()))
             .Throws<InvalidOperationException>();
 
         // Act
-        await service.OnExecutingAsync(message, testMessage => mockService.Object.ProcessMessageAsync(testMessage));
+        await service.OnExecutingAsync(message, (testMessage, ct) => mockService.Object.ProcessMessageAsync(testMessage, ct), CancellationToken.None);
 
         // Assert
         mockLogger.VerifyLog(logger =>
@@ -91,18 +92,18 @@ public class IdempotentServiceTests
         var message = new TestMessage("message1", "group1");
 
         mockStorage
-            .Setup(x => x.HasProcessedAsync(message))
+            .Setup(x => x.HasProcessedAsync(message, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
         mockStorage
             .Setup(x => x.IsMessageExistsError(It.IsAny<InvalidOperationException>()))
             .Returns(false);
         mockService
-            .Setup(x => x.ProcessMessageAsync(message))
+            .Setup(x => x.ProcessMessageAsync(message, It.IsAny<CancellationToken>()))
             .Throws<InvalidOperationException>();
 
         // Act
         var action = async () =>
-            await service.OnExecutingAsync(message, testMessage => mockService.Object.ProcessMessageAsync(testMessage));
+            await service.OnExecutingAsync(message, (testMessage, ct) => mockService.Object.ProcessMessageAsync(testMessage, ct), CancellationToken.None);
 
         // Assert
         await Assert.ThrowsAsync<InvalidOperationException>(action);

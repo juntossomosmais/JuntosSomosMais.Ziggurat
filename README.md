@@ -62,11 +62,11 @@ public class MyMessageConsumerService : IConsumerService<MyMessage>
         _context = context;
     }
 
-    public async Task ProcessMessageAsync(MyMessage message)
+    public async Task ProcessMessageAsync(MyMessage message, CancellationToken cancellationToken = default)
     {
         // Change the application bussiness objects tracked by EF Core
         _context.SomeEntity.Add(x);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
     }
 } 
 ```
@@ -127,14 +127,14 @@ public class MyMessageConsumerService : IConsumerService<MyMessage>
         _client = client;
     }
 
-    public async Task ProcessMessageAsync(MyMessage message)
+    public async Task ProcessMessageAsync(MyMessage message, CancellationToken cancellationToken = default)
     {
         using var session = _client.StartIdempotentTransaction(message);
         // save business object
         var collection = _client.GetDatabase("databaseName").GetCollection<SomeEntity>("someEntity");
-        await collection.InsertOneAsync(session, x);
+        await collection.InsertOneAsync(session, x, cancellationToken: cancellationToken);
         // must commit transaction
-        await session.CommitTransactionAsync();
+        await session.CommitTransactionAsync(cancellationToken);
     }
 }
 ```
@@ -159,10 +159,10 @@ It's possible to create custom middleware for the consumers.
 public class MyMiddleware<TMessage> : IConsumerMiddleware<TMessage>
     where TMessage : IMessage
 {
-   public async Task OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next)
+   public async Task OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next, CancellationToken cancellationToken)
     {
         // Do something before
-        await next(message);
+        await next(message, cancellationToken);
         // Do something after
     }
 }
@@ -181,6 +181,38 @@ Also, it's required to register the middleware on the dependency injection confi
 Important to note that multiple middlewares can be registered to the same consumer. They are executed following the order of the registration.
 
 You can look at the samples folder to see more examples of usage.
+
+### CancellationToken support
+
+The middleware pipeline propagates a `CancellationToken` through every layer: from the consumer entry point, through each middleware, and into the final consumer service. This enables cooperative cancellation during application shutdown or client disconnection.
+
+All interfaces accept a `CancellationToken`:
+
+- `IConsumerService<TMessage>.ProcessMessageAsync(TMessage message, CancellationToken cancellationToken = default)`
+- `IConsumerMiddleware<TMessage>.OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next, CancellationToken cancellationToken)`
+- `ConsumerServiceDelegate<TMessage>(TMessage message, CancellationToken cancellationToken)`
+
+Pass the token from your CAP consumer:
+
+```c#
+public class MyConsumer : ICapSubscribe
+{
+    private readonly IConsumerService<MyMessage> _service;
+
+    public MyConsumer(IConsumerService<MyMessage> service)
+    {
+        _service = service;
+    }
+
+    [CapSubscribe("my.topic", Group = "my.group")]
+    public async Task ConsumeMessage(MyMessage message, CancellationToken cancellationToken)
+    {
+        await _service.ProcessMessageAsync(message, cancellationToken);
+    }
+}
+```
+
+Built-in middlewares (`LoggingMiddleware`, `IdempotencyMiddleware`) forward the token automatically. Custom middlewares must pass `cancellationToken` when calling `next` and to any async operations they perform.
 
 ### Clean old message tracking records
 

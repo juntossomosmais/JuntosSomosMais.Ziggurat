@@ -34,12 +34,12 @@ public class EntityFrameworkStorage<TContext> : IStorage
                entry is not null;
     }
 
-    public async Task<bool> HasProcessedAsync(IMessage message)
+    public async Task<bool> HasProcessedAsync(IMessage message, CancellationToken cancellationToken = default)
     {
         var messageExists = await _messages
             .Where(x => x.Id == message.MessageId)
             .Where(x => x.Type == message.MessageGroup)
-            .AnyAsync();
+            .AnyAsync(cancellationToken);
 
         _messages.Add(new MessageTracking(message.MessageId, message.MessageGroup));
 

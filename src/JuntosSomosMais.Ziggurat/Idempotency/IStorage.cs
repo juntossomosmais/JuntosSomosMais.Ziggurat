@@ -4,7 +4,7 @@ public interface IStorage
 {
     public bool IsMessageExistsError(Exception ex);
 
-    public Task<bool> HasProcessedAsync(IMessage message);
+    public Task<bool> HasProcessedAsync(IMessage message, CancellationToken cancellationToken = default);
 
     public Task<int> DeleteMessagesHistoryOlderThanAsync(int days, int batchSize, CancellationToken cancellationToken);
 

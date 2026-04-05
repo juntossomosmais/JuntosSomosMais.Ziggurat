@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using DotNetCore.CAP;
 using JuntosSomosMais.Ziggurat;
@@ -15,8 +16,8 @@ public class OrderCreatedConsumer : ICapSubscribe
     }
 
     [CapSubscribe("order.created", Group = "catalog.order.created")]
-    public async Task UpdateProductStock(OrderCreatedMessage message)
+    public async Task UpdateProductStock(OrderCreatedMessage message, CancellationToken cancellationToken)
     {
-        await _service.ProcessMessageAsync(message);
+        await _service.ProcessMessageAsync(message, cancellationToken);
     }
 }

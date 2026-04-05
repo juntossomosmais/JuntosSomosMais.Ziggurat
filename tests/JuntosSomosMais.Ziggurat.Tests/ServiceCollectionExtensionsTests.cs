@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -18,7 +19,7 @@ public class ServiceCollectionExtensionsTests
 
         // Act
         var consumer = provider.GetRequiredService<IConsumerService<TestMessage>>();
-        await consumer.ProcessMessageAsync(new TestMessage { MessageId = "1", MessageGroup = "test" });
+        await consumer.ProcessMessageAsync(new TestMessage { MessageId = "1", MessageGroup = "test" }, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.IsType<PipelineHandler<TestMessage>>(consumer);
@@ -87,7 +88,7 @@ public class ServiceCollectionExtensionsTests
 
         // Act
         var consumer = provider.GetRequiredService<IConsumerService<TestMessage>>();
-        await consumer.ProcessMessageAsync(new TestMessage { MessageId = "1", MessageGroup = "test" });
+        await consumer.ProcessMessageAsync(new TestMessage { MessageId = "1", MessageGroup = "test" }, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(new List<string> { "TrackingMiddleware", "TrackingConsumerService" }, executionOrder);
@@ -101,14 +102,14 @@ public class ServiceCollectionExtensionsTests
 
     public class TestConsumerService : IConsumerService<TestMessage>
     {
-        public Task ProcessMessageAsync(TestMessage message) => Task.CompletedTask;
+        public Task ProcessMessageAsync(TestMessage message, CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
     public class TestMiddleware : IConsumerMiddleware<TestMessage>
     {
-        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next)
+        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next, CancellationToken cancellationToken)
         {
-            await next(message);
+            await next(message, cancellationToken);
         }
     }
 
@@ -121,7 +122,7 @@ public class ServiceCollectionExtensionsTests
             _order = order;
         }
 
-        public Task ProcessMessageAsync(TestMessage message)
+        public Task ProcessMessageAsync(TestMessage message, CancellationToken cancellationToken = default)
         {
             _order.Add("TrackingConsumerService");
             return Task.CompletedTask;
@@ -137,10 +138,10 @@ public class ServiceCollectionExtensionsTests
             _order = order;
         }
 
-        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next)
+        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next, CancellationToken cancellationToken)
         {
             _order.Add("TrackingMiddleware");
-            await next(message);
+            await next(message, cancellationToken);
         }
     }
 }

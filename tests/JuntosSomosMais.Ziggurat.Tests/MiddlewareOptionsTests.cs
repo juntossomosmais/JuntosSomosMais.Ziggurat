@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -72,17 +73,17 @@ public class MiddlewareOptionsTests
 
     public class TestMiddleware : IConsumerMiddleware<TestMessage>
     {
-        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next)
+        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next, CancellationToken cancellationToken)
         {
-            await next(message);
+            await next(message, cancellationToken);
         }
     }
 
     public class AnotherTestMiddleware : IConsumerMiddleware<TestMessage>
     {
-        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next)
+        public async Task OnExecutingAsync(TestMessage message, ConsumerServiceDelegate<TestMessage> next, CancellationToken cancellationToken)
         {
-            await next(message);
+            await next(message, cancellationToken);
         }
     }
 }

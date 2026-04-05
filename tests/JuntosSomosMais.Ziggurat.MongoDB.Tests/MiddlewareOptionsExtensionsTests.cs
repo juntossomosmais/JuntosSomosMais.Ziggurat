@@ -6,6 +6,7 @@ using Xunit;
 
 namespace JuntosSomosMais.Ziggurat.MongoDB.Tests;
 
+[Collection("TestFixture Collection")]
 public class MiddlewareOptionsExtensionsTests
 {
     [Fact]

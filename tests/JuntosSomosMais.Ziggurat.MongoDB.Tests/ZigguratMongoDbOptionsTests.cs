@@ -3,7 +3,7 @@ using Xunit;
 
 namespace JuntosSomosMais.Ziggurat.MongoDB.Tests;
 
-[Collection("TextFixture Collection")]
+[Collection("TestFixture Collection")]
 public class ZigguratMongoDbOptionsTests
 {
     [Theory]
@@ -12,12 +12,21 @@ public class ZigguratMongoDbOptionsTests
     public void MongoDatabaseName_IsNullOrEmpty_ThrowsException(string input)
     {
         // Arrange
+        var original = ZigguratMongoDbOptions.MongoDatabaseName;
         ZigguratMongoDbOptions.MongoDatabaseName = input;
 
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => _ = ZigguratMongoDbOptions.MongoDatabaseName);
-        const string expectedMessage =
-            "MongoDB database name must be set. Be sure you are calling `UseMongoDbIdempotency`.";
-        Assert.Equal(expectedMessage, exception.Message);
+        try
+        {
+            // Act & Assert
+            var exception =
+                Assert.Throws<InvalidOperationException>(() => _ = ZigguratMongoDbOptions.MongoDatabaseName);
+            const string expectedMessage =
+                "MongoDB database name must be set. Be sure you are calling `UseMongoDbIdempotency`.";
+            Assert.Equal(expectedMessage, exception.Message);
+        }
+        finally
+        {
+            ZigguratMongoDbOptions.MongoDatabaseName = original;
+        }
     }
 }

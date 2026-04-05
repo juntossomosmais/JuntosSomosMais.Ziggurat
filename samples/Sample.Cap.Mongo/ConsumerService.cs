@@ -15,7 +15,7 @@ public class ConsumerService : IConsumerService<MyMessage>
         _client = client;
     }
 
-    public async Task ProcessMessageAsync(MyMessage message)
+    public async Task ProcessMessageAsync(MyMessage message, CancellationToken cancellationToken = default)
     {
         var databaseName = "test";
         _logger.LogInformation(message.Text);
@@ -23,7 +23,7 @@ public class ConsumerService : IConsumerService<MyMessage>
         using var session = _client.StartIdempotentTransaction(message);
         var collection = _client.GetDatabase(databaseName).GetCollection<MyMessage>("test.collection");
         // save business object
-        await collection.InsertOneAsync(session, message);
-        await session.CommitTransactionAsync();
+        await collection.InsertOneAsync(session, message, cancellationToken: cancellationToken);
+        await session.CommitTransactionAsync(cancellationToken);
     }
 }
