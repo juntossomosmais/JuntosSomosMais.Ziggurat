@@ -214,6 +214,67 @@ public class MyConsumer : ICapSubscribe
 
 Built-in middlewares (`LoggingMiddleware`, `IdempotencyMiddleware`) forward the token automatically. Custom middlewares must pass `cancellationToken` when calling `next` and to any async operations they perform.
 
+### Topic consumer discovery
+
+When building applications with multiple CAP consumers, registering each consumer manually becomes repetitive. The `TopicConsumerDiscovery` class in `JuntosSomosMais.Ziggurat.CapAdapter` automates this by scanning your assembly for consumers that follow the nested handler convention.
+
+The convention expects:
+- A subscriber class implementing `ICapSubscribe` with a method decorated with `[CapSubscribe]`
+- A nested `Handler` class implementing `IConsumerService<TMessage>`
+
+```c#
+public class OrderCreatedConsumer : ICapSubscribe
+{
+    private readonly IConsumerService<OrderCreatedMessage> _service;
+
+    public OrderCreatedConsumer(IConsumerService<OrderCreatedMessage> service)
+        => _service = service;
+
+    [CapSubscribe("order.created", Group = "my-app.order.created")]
+    public async Task HandleAsync(OrderCreatedMessage message, CancellationToken cancellationToken)
+        => await _service.ProcessMessageAsync(message, cancellationToken);
+
+    public class Handler : IConsumerService<OrderCreatedMessage>
+    {
+        public async Task ProcessMessageAsync(OrderCreatedMessage message, CancellationToken cancellationToken = default)
+        {
+            // Business logic here
+        }
+    }
+}
+```
+
+First, implement `IMiddlewareConfigurator` to define the middleware pipeline that applies to all consumers in your application:
+
+```c#
+public class AppMiddlewareConfigurator : IMiddlewareConfigurator
+{
+    public void Configure<TMessage>(MiddlewareOptions<TMessage> options) where TMessage : class, IMessage
+    {
+        options.UseEntityFrameworkIdempotency<TMessage, AppDbContext>();
+    }
+}
+```
+
+Then call `BuildTopicConsumerMap` to scan the assembly and build a map of topic names to consumer registration actions:
+
+```c#
+var topicConsumerMap = TopicConsumerDiscovery.BuildTopicConsumerMap(
+    typeof(Program).Assembly,
+    new AppMiddlewareConfigurator());
+```
+
+The returned dictionary maps each topic name (from `[CapSubscribe]`) to a tuple containing the consumer class name and an `Action<IServiceCollection>` that registers the subscriber and its handler with the DI container. This handles `AddScoped<TSubscriber>()` and `AddConsumerService<TMessage, THandler>(...)` automatically.
+
+This is useful for applications that use a CLI command to start a worker for a specific topic:
+
+```c#
+if (topicConsumerMap.TryGetValue(topicName, out var entry))
+{
+    entry.Register(services);
+}
+```
+
 ### Clean old message tracking records
 
 The library provides a method to clean old message tracking records. A background service can be added using the extension method `AddZigguratCleaner`:
