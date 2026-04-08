@@ -26,14 +26,23 @@ Ziggurat has support to:
 - Messaging Library
   - [CAP](https://cap.dotnetcore.xyz/)
 
-## Install
+## Packages
 
-|                                        |                                                                                                              |
-|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| JuntosSomosMais.Ziggurat              | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat)                 |
-| JuntosSomosMais.Ziggurat.CapAdapter   | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.CapAdapter)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.CapAdapter) |
-| JuntosSomosMais.Ziggurat.SqlServer    | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.SqlServer)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.SqlServer) |
-| JuntosSomosMais.Ziggurat.MongoDB      | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.MongoDB)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.MongoDB) |
+| Package | Version | Description |
+|---|---|---|
+| [JuntosSomosMais.Ziggurat](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat/) | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat) | Core library with the middleware pipeline, `IConsumerService<T>`, idempotency middleware, logging middleware, and message tracking cleaner. |
+| [JuntosSomosMais.Ziggurat.CapAdapter](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.CapAdapter/) | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.CapAdapter)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.CapAdapter) | [CAP](https://cap.dotnetcore.xyz/) integration: `BootstrapFilter` for message enrichment and `TopicConsumerDiscovery` for automatic consumer registration. |
+| [JuntosSomosMais.Ziggurat.SqlServer](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.SqlServer/) | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.SqlServer)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.SqlServer) | Entity Framework Core storage adapter for idempotency message tracking with SQL Server. |
+| [JuntosSomosMais.Ziggurat.MongoDB](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.MongoDB/) | [![Nuget](https://img.shields.io/nuget/v/JuntosSomosMais.Ziggurat.MongoDB)](https://www.nuget.org/packages/JuntosSomosMais.Ziggurat.MongoDB) | MongoDB storage adapter for idempotency message tracking with support for idempotent transactions. |
+
+Install via CLI:
+
+```bash
+dotnet add package JuntosSomosMais.Ziggurat
+dotnet add package JuntosSomosMais.Ziggurat.CapAdapter
+dotnet add package JuntosSomosMais.Ziggurat.SqlServer
+dotnet add package JuntosSomosMais.Ziggurat.MongoDB
+```
 
 ## Usage
 
