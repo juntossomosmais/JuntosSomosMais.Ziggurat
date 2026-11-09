@@ -9,6 +9,15 @@ updates:
     target-branch: "main"
     reviewers:
       - "core"
+    # src/Directory.Packages.props pins one minimum version per target framework.
+    # Major updates would raise the net8.0 floors, so they are done by hand.
+    ignore:
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: [ "version-update:semver-major" ]
+      - dependency-name: "Microsoft.EntityFrameworkCore*"
+        update-types: [ "version-update:semver-major" ]
+      - dependency-name: "DotNetCore.CAP"
+        update-types: [ "version-update:semver-major" ]
   # ignore npm packages from sample
   - package-ecosystem: "nuget"
     directory: "/samples/"
