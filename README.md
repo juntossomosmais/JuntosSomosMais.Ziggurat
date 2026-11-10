@@ -58,8 +58,6 @@ Every package ships one assembly per target framework. Each one declares the low
 
 The database schema (the `MessageTracking` table and collection) and the idempotency behavior are the same for every target framework.
 
-The cleaner (`AddZigguratCleaner`) is a `BackgroundService`. With `Microsoft.Extensions.Hosting.Abstractions` 10 or later (always the case on `net10.0`, and possible on `net8.0`), the host runs the whole `ExecuteAsync` in the background, so the first cleaning may no longer run while the host is starting. This comes from the hosting package your application resolves, not from this library, and it does not change what gets deleted or the cleaning interval.
-
 ### Migrating from the `Ziggurat` package
 
 These packages started as a fork of [Ziggurat](https://github.com/rafaelpadovezi/Ziggurat). Moving from `Ziggurat`, `Ziggurat.CapAdapter`, `Ziggurat.SqlServer` or `Ziggurat.MongoDB` requires these changes:
@@ -68,7 +66,9 @@ These packages started as a fork of [Ziggurat](https://github.com/rafaelpadovezi
 2. Replace the `Ziggurat` namespaces with `JuntosSomosMais.Ziggurat` (for example, `using Ziggurat.SqlServer;` becomes `using JuntosSomosMais.Ziggurat.SqlServer;`).
 3. Add the `CancellationToken` parameter to your implementations, as described in [CancellationToken support](#cancellationtoken-support):
    - `IConsumerService<TMessage>.ProcessMessageAsync(TMessage message, CancellationToken cancellationToken = default)`
-   - `IConsumerMiddleware<TMessage>.OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next, CancellationToken cancellationToken)`
+   - `IConsumerMiddleware<TMessage>.OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next, CancellationToken cancellationToken)`, passing it on with `await next(message, cancellationToken)`
+   - `IStorage.HasProcessedAsync(IMessage message, CancellationToken cancellationToken = default)`, if you have a custom storage
+4. Coming from `Ziggurat` 7.x, first move the app to the target framework and the dependency versions in the [compatibility table](#compatibility), including MongoDB.Driver 3.x and its [breaking changes](https://www.mongodb.com/docs/drivers/csharp/current/reference/upgrade/v3/).
 
 The table name, the collection name and the message tracking columns did not change, so no migration of the tracking data is needed.
 
