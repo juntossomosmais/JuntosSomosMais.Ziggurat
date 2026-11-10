@@ -19,6 +19,8 @@ public class CleanerTests
     private static Task WhenLogged(Mock<ILogger<Cleaner>> logger, LogLevel level, string message)
     {
         var logged = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        // CA1873 does not apply: this is a Moq setup expression tree, never executed as a logging call.
+#pragma warning disable CA1873
         logger
             .Setup(x => x.Log(
                 level,
@@ -27,6 +29,7 @@ public class CleanerTests
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()))
             .Callback(() => logged.TrySetResult());
+#pragma warning restore CA1873
         return logged.Task;
     }
 
