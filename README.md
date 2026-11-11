@@ -48,15 +48,14 @@ The packages are only published as pre-release versions, so `--prerelease` is re
 
 ## Compatibility
 
-Every package ships one assembly per target framework. Each one declares the lowest dependency versions it was built and tested against, so your application can use any newer minor or patch version.
+The packages target only the latest .NET version used across the company. Each one declares the lowest dependency versions it was built and tested against, so your application can use any newer minor or patch version.
 
 | Package version | Target framework | Microsoft.Extensions.* | EF Core (SqlServer) | CAP (CapAdapter) | MongoDB.Driver (MongoDB) |
 |---|---|---|---|---|---|
 | 0.1.0-test.3 and later | `net10.0` | ≥ 10.0.0 | ≥ 10.0.0 | ≥ 10.0.0 | ≥ 3.1.0 |
-| 0.1.0-test.3 and later | `net8.0` | ≥ 8.0.1 | ≥ 8.0.15 | ≥ 8.3.4 | ≥ 3.1.0 |
 | 0.1.0-test.1 and 0.1.0-test.2 | `net8.0` | ≥ 8.0.1 | ≥ 8.0.15 | ≥ 8.3.4 | ≥ 3.1.0 |
 
-The database schema (the `MessageTracking` table and collection) and the idempotency behavior are the same for every target framework.
+Applications still on `net8.0` must move to `net10.0` to use 0.1.0-test.3 or later. The database schema (the `MessageTracking` table and collection) and the idempotency behavior did not change between these versions.
 
 ### Migrating from the `Ziggurat` package
 

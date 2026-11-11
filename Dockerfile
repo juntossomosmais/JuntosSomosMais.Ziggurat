@@ -1,9 +1,5 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0
 
-# Projects target net8.0 and net10.0 - the SDK image ships the 10.0 runtime, install 8.0 so dotnet test/run works
-COPY --from=mcr.microsoft.com/dotnet/runtime:8.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
-COPY --from=mcr.microsoft.com/dotnet/aspnet:8.0 /usr/share/dotnet/shared /usr/share/dotnet/shared
-
 WORKDIR /app
 
 # Restores (downloads) all NuGet packages on a separate layer for caching
