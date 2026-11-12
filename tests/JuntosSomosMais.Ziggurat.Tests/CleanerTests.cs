@@ -181,8 +181,10 @@ public class CleanerTests
 
         // Act
         var hostedService = serviceProvider.GetRequiredService<IHostedService>();
+        var removedAfterErrorLogged = WhenLogged(mockLogger, LogLevel.Information, "Ziggurat cleaner background service removed 5 messages.");
         await hostedService.StartAsync(cancellationTokenSource.Token);
         await deleteErrorLogged.WaitAsync(LogTimeout, TestContext.Current.CancellationToken);
+        await removedAfterErrorLogged.WaitAsync(LogTimeout, TestContext.Current.CancellationToken);
 
         // Assert
         mockLogger.VerifyLog(x => x.LogError("Ziggurat cleaner found an error occurred while deleting old messages."));
