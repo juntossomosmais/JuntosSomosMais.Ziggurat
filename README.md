@@ -38,11 +38,38 @@ Ziggurat has support to:
 Install via CLI:
 
 ```bash
-dotnet add package JuntosSomosMais.Ziggurat
-dotnet add package JuntosSomosMais.Ziggurat.CapAdapter
-dotnet add package JuntosSomosMais.Ziggurat.SqlServer
-dotnet add package JuntosSomosMais.Ziggurat.MongoDB
+dotnet add package JuntosSomosMais.Ziggurat --prerelease
+dotnet add package JuntosSomosMais.Ziggurat.CapAdapter --prerelease
+dotnet add package JuntosSomosMais.Ziggurat.SqlServer --prerelease
+dotnet add package JuntosSomosMais.Ziggurat.MongoDB --prerelease
 ```
+
+The packages are only published as pre-release versions, so `--prerelease` is required.
+
+## Compatibility
+
+The packages target only the latest .NET version used across the company. Each one declares the lowest dependency versions it was built and tested against, so your application can use any newer minor or patch version.
+
+| Package version | Target framework | Microsoft.Extensions.* | EF Core (SqlServer) | CAP (CapAdapter) | MongoDB.Driver (MongoDB) |
+|---|---|---|---|---|---|
+| 0.1.0-test.3 and later | `net10.0` | ≥ 10.0.0 | ≥ 10.0.0 | ≥ 10.0.0 | ≥ 3.1.0 |
+| 0.1.0-test.1 and 0.1.0-test.2 | `net8.0` | ≥ 8.0.1 | ≥ 8.0.15 | ≥ 8.3.4 | ≥ 3.1.0 |
+
+Applications still on `net8.0` must move to `net10.0` to use 0.1.0-test.3 or later. The database schema (the `MessageTracking` table and collection) and the idempotency behavior did not change between these versions.
+
+### Migrating from the `Ziggurat` package
+
+These packages started as a fork of [Ziggurat](https://github.com/rafaelpadovezi/Ziggurat). Moving from `Ziggurat`, `Ziggurat.CapAdapter`, `Ziggurat.SqlServer` or `Ziggurat.MongoDB` requires these changes:
+
+1. Replace each package reference with its `JuntosSomosMais.` counterpart.
+2. Replace the `Ziggurat` namespaces with `JuntosSomosMais.Ziggurat` (for example, `using Ziggurat.SqlServer;` becomes `using JuntosSomosMais.Ziggurat.SqlServer;`).
+3. Add the `CancellationToken` parameter to your implementations, as described in [CancellationToken support](#cancellationtoken-support):
+   - `IConsumerService<TMessage>.ProcessMessageAsync(TMessage message, CancellationToken cancellationToken = default)`
+   - `IConsumerMiddleware<TMessage>.OnExecutingAsync(TMessage message, ConsumerServiceDelegate<TMessage> next, CancellationToken cancellationToken)`, passing it on with `await next(message, cancellationToken)`
+   - `IStorage.HasProcessedAsync(IMessage message, CancellationToken cancellationToken = default)`, if you have a custom storage
+4. Coming from `Ziggurat` 7.x, first move the app to the target framework and the dependency versions in the [compatibility table](#compatibility), including MongoDB.Driver 3.x and its [breaking changes](https://www.mongodb.com/docs/drivers/csharp/current/reference/upgrade/v3/).
+
+The table name, the collection name and the message tracking columns did not change, so no migration of the tracking data is needed.
 
 ## Usage
 
@@ -258,7 +285,7 @@ First, implement `IMiddlewareConfigurator` to define the middleware pipeline tha
 ```c#
 public class AppMiddlewareConfigurator : IMiddlewareConfigurator
 {
-    public void Configure<TMessage>(MiddlewareOptions<TMessage> options) where TMessage : class, IMessage
+    public void Configure<TMessage>(MiddlewareOptions<TMessage> options) where TMessage : IMessage
     {
         options.UseEntityFrameworkIdempotency<TMessage, AppDbContext>();
     }

@@ -12,6 +12,27 @@ namespace JuntosSomosMais.Ziggurat.Tests;
 
 public class CleanerTests
 {
+    // Since Microsoft.Extensions.Hosting.Abstractions 10, BackgroundService.StartAsync no longer runs the
+    // synchronous part of ExecuteAsync before returning, so tests must wait for the cleaner to reach the expected point.
+    private static readonly TimeSpan LogTimeout = TimeSpan.FromSeconds(10);
+
+    private static Task WhenLogged(Mock<ILogger<Cleaner>> logger, LogLevel level, string message)
+    {
+        var logged = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        // CA1873 does not apply: this is a Moq setup expression tree, never executed as a logging call.
+#pragma warning disable CA1873
+        logger
+            .Setup(x => x.Log(
+                level,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((state, _) => state.ToString() == message),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()))
+            .Callback(() => logged.TrySetResult());
+#pragma warning restore CA1873
+        return logged.Task;
+    }
+
     [Fact]
     public async Task StartAsync_ShouldCallStorageDeleteAndLog()
     {
@@ -27,6 +48,7 @@ public class CleanerTests
             options.BatchSize = batchSize;
         });
         var mockLogger = new Mock<ILogger<Cleaner>>();
+        var removedLogged = WhenLogged(mockLogger, LogLevel.Information, "Ziggurat cleaner background service removed 10 messages.");
         services.AddSingleton(_ => mockLogger.Object);
         var mockStorage = new Mock<IStorage>();
         mockStorage
@@ -43,6 +65,7 @@ public class CleanerTests
         // Act
         var hostedService = serviceProvider.GetRequiredService<IHostedService>();
         await hostedService.StartAsync(cancellationTokenSource.Token);
+        await removedLogged.WaitAsync(LogTimeout, TestContext.Current.CancellationToken);
 
         // Assert
         mockStorage.Verify();
@@ -65,6 +88,7 @@ public class CleanerTests
             options.BatchSize = batchSize;
         });
         var mockLogger = new Mock<ILogger<Cleaner>>();
+        var stoppingLogged = WhenLogged(mockLogger, LogLevel.Information, "Ziggurat cleaner background service is stopping.");
         services.AddSingleton(_ => mockLogger.Object);
         var mockStorage = new Mock<IStorage>();
         mockStorage
@@ -91,11 +115,10 @@ public class CleanerTests
         var hostedService = serviceProvider.GetRequiredService<IHostedService>();
         await hostedService.StartAsync(cancellationTokenSource.Token);
 
+        await stoppingLogged.WaitAsync(LogTimeout, TestContext.Current.CancellationToken);
+
         // Assert
-        while (!cancellationTokenSource.IsCancellationRequested)
-        {
-            await Task.Delay(100, TestContext.Current.CancellationToken);
-        }
+        Assert.True(cancellationTokenSource.IsCancellationRequested);
         mockStorage.Verify();
         mockLogger.VerifyLog(x => x.LogInformation("Ziggurat cleaner background service is stopping."));
     }
@@ -136,6 +159,7 @@ public class CleanerTests
             options.BatchSize = batchSize;
         });
         var mockLogger = new Mock<ILogger<Cleaner>>();
+        var deleteErrorLogged = WhenLogged(mockLogger, LogLevel.Error, "Ziggurat cleaner found an error occurred while deleting old messages.");
         services.AddSingleton(_ => mockLogger.Object);
         var mockStorage = new Mock<IStorage>();
         mockStorage
@@ -157,13 +181,12 @@ public class CleanerTests
 
         // Act
         var hostedService = serviceProvider.GetRequiredService<IHostedService>();
+        var removedAfterErrorLogged = WhenLogged(mockLogger, LogLevel.Information, "Ziggurat cleaner background service removed 5 messages.");
         await hostedService.StartAsync(cancellationTokenSource.Token);
+        await deleteErrorLogged.WaitAsync(LogTimeout, TestContext.Current.CancellationToken);
+        await removedAfterErrorLogged.WaitAsync(LogTimeout, TestContext.Current.CancellationToken);
 
         // Assert
-        while (!cancellationTokenSource.IsCancellationRequested)
-        {
-            await Task.Delay(100, TestContext.Current.CancellationToken);
-        }
         mockLogger.VerifyLog(x => x.LogError("Ziggurat cleaner found an error occurred while deleting old messages."));
     }
 
@@ -201,6 +224,7 @@ public class CleanerTests
             options.BatchSize = batchSize;
         });
         var mockLogger = new Mock<ILogger<Cleaner>>();
+        var initializationErrorLogged = WhenLogged(mockLogger, LogLevel.Error, "Could not initialize Ziggurat Cleaner properly. Cleaner is shutting up.");
         services.AddSingleton(_ => mockLogger.Object);
         var mockStorage = new Mock<IStorage>();
         mockStorage
@@ -214,6 +238,7 @@ public class CleanerTests
         // Act
         var hostedService = serviceProvider.GetRequiredService<IHostedService>();
         await hostedService.StartAsync(cancellationTokenSource.Token);
+        await initializationErrorLogged.WaitAsync(LogTimeout, TestContext.Current.CancellationToken);
 
         // Assert
         mockLogger.VerifyLog(x => x.LogError("Could not initialize Ziggurat Cleaner properly. Cleaner is shutting up."));

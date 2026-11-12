@@ -9,6 +9,12 @@ updates:
     target-branch: "main"
     reviewers:
       - "core"
+    # src/Directory.Packages.props sets the minimum versions consumers resolve, so these are raised by hand.
+    ignore:
+      - dependency-name: "Microsoft.Extensions.*"
+      - dependency-name: "Microsoft.EntityFrameworkCore*"
+      - dependency-name: "DotNetCore.CAP"
+      - dependency-name: "MongoDB.Driver"
   # ignore npm packages from sample
   - package-ecosystem: "nuget"
     directory: "/samples/"
